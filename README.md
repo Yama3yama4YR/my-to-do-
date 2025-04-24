@@ -1,1 +1,134 @@
-# my-to-do-
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My ToDoリスト</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f7f7f7;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    input, select {
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .todo-item {
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .priority-high {
+      border-left: 8px solid #e74c3c;
+    }
+    .priority-medium {
+      border-left: 8px solid #f39c12;
+    }
+    .priority-low {
+      border-left: 8px solid #95a5a6;
+    }
+    button {
+      margin-left: 10px;
+      padding: 5px 8px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .done {
+      text-decoration: line-through;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📝 My ToDoリスト</h1>
+
+  <input type="text" id="todo-text" placeholder="やることを入力してね">
+  <input type="time" id="todo-time">
+  <select id="todo-priority">
+    <option value="high">優先度：高</option>
+    <option value="medium">優先度：中</option>
+    <option value="low">優先度：低</option>
+  </select>
+  <button onclick="addTodo()">追加</button>
+
+  <ul id="todo-list"></ul>
+
+  <audio id="alert-sound" src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" preload="auto"></audio>
+
+  <script>
+    const list = document.getElementById("todo-list");
+    const sound = document.getElementById("alert-sound");
+
+    function addTodo() {
+      const text = document.getElementById("todo-text").value.trim();
+      const time = document.getElementById("todo-time").value;
+      const priority = document.getElementById("todo-priority").value;
+
+      if (!text || !time) return;
+
+      const li = document.createElement("li");
+      li.className = `todo-item priority-${priority}`;
+      li.innerHTML = `
+        <div>
+          <strong>${text}</strong><br>
+          <small>⏰ ${time}</small>
+        </div>
+        <div>
+          <button onclick="markDone(this)">✅</button>
+          <button onclick="removeTodo(this)">🗑</button>
+        </div>
+      `;
+
+      list.appendChild(li);
+
+      scheduleNotification(text, time);
+      document.getElementById("todo-text").value = "";
+      document.getElementById("todo-time").value = "";
+    }
+
+    function markDone(btn) {
+      const item = btn.closest("li");
+      item.classList.toggle("done");
+    }
+
+    function removeTodo(btn) {
+      const item = btn.closest("li");
+      item.remove();
+    }
+
+    function scheduleNotification(task, time) {
+      const now = new Date();
+      const [hour, minute] = time.split(":");
+      const target = new Date();
+      target.setHours(parseInt(hour));
+      target.setMinutes(parseInt(minute));
+      target.setSeconds(0);
+
+      let diff = target - now;
+      if (diff < 0) return;
+
+      setTimeout(() => {
+        alert(`🔔 時間です：「${task}」`);
+        sound.play();
+      }, diff);
+    }
+  </script>
+
+</body>
+</html>
